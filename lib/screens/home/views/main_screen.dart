@@ -89,7 +89,7 @@ class MainScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    blurRadius: 2,
+                    blurRadius: 4,
                     color: Colors.grey.shade400,
                     offset: Offset(5, 5)
                   )
@@ -205,13 +205,118 @@ class MainScreen extends StatelessWidget {
                       ],
                     ),
                   )
-
                 ],
               ),
+            ),
+            const SizedBox(height: 40,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                    'Transactions',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+
+                  },
+                  child: Text(
+                    'View All',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.outline,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 20,),
+            Expanded(
+              child: ListView.builder(
+                itemCount: 10,
+                itemBuilder: (context, int i) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Container(
+                                      height: 50,
+                                      width: 50,
+                                      decoration: BoxDecoration(
+                                        color: Colors.yellow[700],
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.food_bank_outlined,
+                                      color: Colors.white,
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(width: 16,),
+                                Text(
+                                  'Food',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+
+                                // Add more widgets to Row if needed
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  '-\$40',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                Text(
+                                  'Today',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context).colorScheme.outline,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            )
+                          ]
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
             )
+
+
           ], // Column
         ),
-      ), // Padding
+      ),
     );
   }
 }
