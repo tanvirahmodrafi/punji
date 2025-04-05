@@ -260,19 +260,16 @@ class MainScreen extends StatelessWidget {
                                       height: 50,
                                       width: 50,
                                       decoration: BoxDecoration(
-                                        color: Colors.yellow[700],
+                                        color: transactionsData[i]['color'],
                                         shape: BoxShape.circle,
                                       ),
                                     ),
-                                    Icon(
-                                      Icons.food_bank_outlined,
-                                      color: Colors.white,
-                                    )
+                                    transactionsData[i]['icon']
                                   ],
                                 ),
                                 const SizedBox(width: 16,),
                                 Text(
-                                  'Food',
+                                  transactionsData[i]['name'],
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Theme.of(context).colorScheme.onSurface,
@@ -284,9 +281,10 @@ class MainScreen extends StatelessWidget {
                               ],
                             ),
                             Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  '-\$40',
+                                  transactionsData[i]['totalAmount'],
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Theme.of(context).colorScheme.onSurface,
@@ -294,7 +292,7 @@ class MainScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  'Today',
+                                  transactionsData[i]['date'],
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Theme.of(context).colorScheme.outline,
@@ -311,8 +309,6 @@ class MainScreen extends StatelessWidget {
                 },
               ),
             )
-
-
           ], // Column
         ),
       ),
