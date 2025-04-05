@@ -1,8 +1,7 @@
 import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:punji/data/data.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -238,7 +237,7 @@ class MainScreen extends StatelessWidget {
             const SizedBox(height: 20,),
             Expanded(
               child: ListView.builder(
-                itemCount: 10,
+                itemCount: transactionsData.length,
                 itemBuilder: (context, int i) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
