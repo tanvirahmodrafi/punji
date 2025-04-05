@@ -1,4 +1,3 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:punji/screens/stats/chart.dart';
 
@@ -24,8 +23,15 @@ class StatScreen extends StatelessWidget {
             Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
               // color: Colors.red,
-              child: MyChart()
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 20, 12, 12),
+                child: MyChart(),
+              )
             )
           ],
         ),
