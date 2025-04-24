@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:punji/screens/addEpense/views/addExpense.dart';
 import 'package:punji/screens/home/views/main_screen.dart';
 
 import '../../stats/stats.dart';
@@ -65,7 +66,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton.large(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) =>const AddExpense()
+            ),
+          );
+        },
         shape: const CircleBorder(),
         child: Container(
           width: 100, // Custom width
