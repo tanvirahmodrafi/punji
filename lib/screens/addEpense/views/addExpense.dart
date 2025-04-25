@@ -68,6 +68,12 @@ class _AddExpenseState extends State<AddExpense> {
               const SizedBox(height: 32,),
               TextFormField(
                 controller: categoryController,
+                textAlignVertical: TextAlignVertical.center,
+                readOnly: true,
+                onTap: () {
+
+                },
+
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -75,6 +81,96 @@ class _AddExpenseState extends State<AddExpense> {
                     FontAwesomeIcons.list,
                     size: 16,
                     color: Colors.grey,
+                  ),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx){
+                          return AlertDialog(
+                            title: const Text("Create a Category"),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextFormField(
+                                  textAlignVertical: TextAlignVertical.center,
+
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    hintText: "Name",
+                                    hintStyle: TextStyle(        // Modify hint text color here
+                                      color: Colors.grey[600],        // Set the hint text color
+                                      fontWeight: FontWeight.w400, // Optional: Customize font weight
+                                      fontSize: 14,               // Optional: Customize font size
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20,),
+                                TextFormField(
+                                  //controller: dateController,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    // prefixIcon: const Icon(
+                                    //   FontAwesomeIcons.clock,
+                                    //   size: 16,
+                                    //   color: Colors.grey,
+                                    // ),
+                                    hintText: "Icon",
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey[600],        // Set the hint text color
+                                      fontWeight: FontWeight.w400, // Optional: Customize font weight
+                                      fontSize: 14,               // Optional: Customize font size
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20,),
+                                TextFormField(
+                                  //controller: dateController,
+                                  textAlignVertical: TextAlignVertical.center,
+
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    // prefixIcon: const Icon(
+                                    //   FontAwesomeIcons.clock,
+                                    //   size: 16,
+                                    //   color: Colors.grey,
+                                    // ),
+                                    hintText: "Color",
+                                    hintStyle: TextStyle(        // Modify hint text color here
+                                      color: Colors.grey[600],        // Set the hint text color
+                                      fontWeight: FontWeight.w400, // Optional: Customize font weight
+                                      fontSize: 14,               // Optional: Customize font size
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          );
+
+                        }
+                      );
+                    },
+                    icon: const Icon(
+                      FontAwesomeIcons.plus,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                   ),
                   hintText: "Enter category",  // Your hint text
                   hintStyle: TextStyle(        // Modify hint text color here
@@ -92,6 +188,7 @@ class _AddExpenseState extends State<AddExpense> {
               const SizedBox(height: 16,),
               TextFormField(
                 controller: dateController,
+                readOnly: true,
                 textAlignVertical: TextAlignVertical.center,
                 onTap: () async {
                   FocusScope.of(context).requestFocus(FocusNode());  // Dismiss keyboard when date picker is shown
