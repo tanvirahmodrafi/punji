@@ -232,7 +232,7 @@ class _AddExpenseState extends State<AddExpense> {
                                                   mainAxisSize: MainAxisSize.min,
                                                   children: [
                                                     ColorPicker(
-                                                      pickerColor: Colors.blue,
+                                                      pickerColor: categoryColor,
                                                       onColorChanged: (value) {
                                                         setState(() {
                                                           categoryColor = value;
