@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   firebase_auth: ^4.16.0
+  cloud_firestorm: ^4.9.2
   cloud_firestore: ^4.9.2
   # rxdart: ^0.27.7
 
