@@ -1,4 +1,4 @@
-platform :ios, '16.0'
+platform :ios, '16.6'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -31,6 +31,7 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
   target 'RunnerTests' do
     inherit! :search_paths
   end
@@ -83,30 +84,14 @@ post_install do |installer|
       config.build_settings['SWIFT_VERSION'] = '5.0'
 
       # Add permission configurations
-            config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
-              '$(inherited)',
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+        '$(inherited)',
 
-              # Enable only the permissions we need
-              'PERMISSION_PHOTOS=1',
-              'PERMISSION_LOCATION_WHENINUSE=1',
-              'PERMISSION_NOTIFICATIONS=1',
-
-              # Explicitly disable all other permissions
-              'PERMISSION_LOCATION=0',
-              'PERMISSION_EVENTS=0',
-              'PERMISSION_EVENTS_FULL_ACCESS=0',
-              'PERMISSION_REMINDERS=0',
-              'PERMISSION_CONTACTS=0',
-              'PERMISSION_CAMERA=0',
-              'PERMISSION_MICROPHONE=0',
-              'PERMISSION_SPEECH_RECOGNIZER=0',
-              'PERMISSION_MEDIA_LIBRARY=0',
-              'PERMISSION_SENSORS=0',
-              'PERMISSION_BLUETOOTH=0',
-              'PERMISSION_APP_TRACKING_TRANSPARENCY=0',
-              'PERMISSION_CRITICAL_ALERTS=0',
-              'PERMISSION_ASSISTANT=0'
-            ]
+        # Enable only the permissions we need
+        'PERMISSION_PHOTOS=1',
+        'PERMISSION_LOCATION_WHENINUSE=1',
+        'PERMISSION_NOTIFICATIONS=1',
+      ]
     end
   end
 end
