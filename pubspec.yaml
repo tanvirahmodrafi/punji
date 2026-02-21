@@ -42,14 +42,13 @@ dependencies:
   expense_repository:
    path: packages/expense_repository
 
-  firebase_core: ^3.13.0
-  firebase_auth: ^5.5.3
-  cloud_firestore: ^5.6.7
+  supabase_flutter: ^2.8.4
 
 
   bloc: ^9.0.0
   flutter_bloc: ^9.1.1
   equatable: ^2.0.7
+  uuid: ^4.5.1
 
 
 dev_dependencies:

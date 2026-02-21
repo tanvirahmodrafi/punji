@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:expense_repository/expense_repository.dart';
@@ -15,7 +17,8 @@ class CreateCategoryBloc extends Bloc<CreateCategoryEvent, CreateCategoryState> 
         await expenseRepository.createCategory(event.category);
         emit(CreateCategorySuccess());
       } catch (e) {
-        emit(CreateCategoryFailure());
+        log('CreateCategoryBloc error: $e');
+        emit(CreateCategoryFailure(error: e.toString()));
       }
     });
   }

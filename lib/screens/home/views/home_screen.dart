@@ -1,7 +1,13 @@
 import 'dart:math';
+import 'package:expense_repository/expense_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:punji/screens/addEpense/blocs/create_category/create_category_bloc.dart';
+import 'package:punji/screens/addEpense/blocs/create_expense/create_expense_bloc.dart';
+import 'package:punji/screens/addEpense/blocs/get_categories/get_category_bloc.dart';
 import 'package:punji/screens/addEpense/views/addExpense.dart';
+import 'package:punji/screens/home/blocs/get_expenses/get_expenses_bloc.dart';
 import 'package:punji/screens/home/views/main_screen.dart';
 
 import '../../stats/stats.dart';
@@ -14,7 +20,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   int index = 0;
   late Color selectedItem = Colors.blueAccent;
   Color unSelectedItem = Colors.grey;
@@ -30,16 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       // Bottom Navigation Bar with `onTap` to switch between the screens
       bottomNavigationBar: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(16),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         child: BottomNavigationBar(
           currentIndex: index,
           onTap: (value) {
             setState(() {
               index = value;
             });
-
           },
           backgroundColor: Colors.white,
           showSelectedLabels: false,
@@ -55,10 +57,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             BottomNavigationBarItem(
               icon: Icon(
-                CupertinoIcons.settings,
+                CupertinoIcons.chart_bar_alt_fill,
                 color: index == 1 ? selectedItem : unSelectedItem,
               ),
-              label: 'Setting',
+              label: 'Stats',
             ),
           ],
         ),
@@ -66,13 +68,37 @@ class _HomeScreenState extends State<HomeScreen> {
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton.large(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final expenseRepository = context.read<ExpenseRepository>();
+          await Navigator.push(
             context,
             MaterialPageRoute<void>(
-              builder: (BuildContext context) =>const AddExpense()
+              builder:
+                  (BuildContext context) => MultiBlocProvider(
+                    providers: [
+                      BlocProvider(
+                        create:
+                            (context) => CreateCategoryBloc(expenseRepository),
+                      ),
+                      BlocProvider(
+                        create:
+                            (context) =>
+                                GetCategoryBloc(expenseRepository)
+                                  ..add(GetCategories()),
+                      ),
+                      BlocProvider(
+                        create:
+                            (context) => CreateExpenseBloc(expenseRepository),
+                      ),
+                    ],
+                    child: const AddExpense(),
+                  ),
             ),
           );
+          // Refresh expenses when returning from AddExpense
+          if (mounted) {
+            context.read<GetExpensesBloc>().add(GetExpenses());
+          }
         },
         shape: const CircleBorder(),
         child: Container(
@@ -98,9 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Switch between screens based on selected index
       //body: widgetList[index],
-      body: index == 0
-      ? MainScreen()
-      : StatScreen(),
+      body: index == 0 ? MainScreen() : StatScreen(),
     );
   }
 }

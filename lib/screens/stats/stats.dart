@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:punji/screens/home/blocs/get_expenses/get_expenses_bloc.dart';
 import 'package:punji/screens/stats/chart.dart';
 
 class StatScreen extends StatelessWidget {
-  const StatScreen ({super.key});
+  const StatScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,10 +15,10 @@ class StatScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-                'Transactions',
-              style:  TextStyle(
+              'Transactions',
+              style: TextStyle(
                 fontSize: 20,
-                fontWeight: FontWeight.bold
+                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 20),
@@ -27,12 +29,18 @@ class StatScreen extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
-              // color: Colors.red,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(12, 20, 12, 12),
-                child: MyChart(),
-              )
-            )
+                child: BlocBuilder<GetExpensesBloc, GetExpensesState>(
+                  builder: (context, state) {
+                    if (state is GetExpensesSuccess) {
+                      return MyChart(expenses: state.expenses);
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
