@@ -109,3 +109,63 @@ on public.incomes for all
 using (auth.uid() = "userId")
 with check (auth.uid() = "userId");
 ```
+
+## Storage RLS for Profile Image Upload
+
+If profile image upload fails with:
+
+`new row violates row-level security policy (403 Unauthorized)`
+
+run this SQL in Supabase SQL Editor:
+
+```sql
+-- Ensure the bucket exists (name must match app code: User Image)
+insert into storage.buckets (id, name, public)
+values ('User Image', 'User Image', true)
+on conflict (id) do nothing;
+
+-- Remove old policies if they exist
+drop policy if exists "user_image_insert_own" on storage.objects;
+drop policy if exists "user_image_select_own" on storage.objects;
+drop policy if exists "user_image_update_own" on storage.objects;
+drop policy if exists "user_image_delete_own" on storage.objects;
+
+-- Allow authenticated users to upload only inside their own folder: <auth.uid()>/...
+create policy "user_image_insert_own"
+on storage.objects for insert
+to authenticated
+with check (
+	bucket_id = 'User Image'
+	and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- Allow reading profile images from own folder (public bucket can be read by URL as well)
+create policy "user_image_select_own"
+on storage.objects for select
+to authenticated
+using (
+	bucket_id = 'User Image'
+	and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- Allow updating and deleting only own files
+create policy "user_image_update_own"
+on storage.objects for update
+to authenticated
+using (
+	bucket_id = 'User Image'
+	and (storage.foldername(name))[1] = auth.uid()::text
+)
+with check (
+	bucket_id = 'User Image'
+	and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+create policy "user_image_delete_own"
+on storage.objects for delete
+to authenticated
+using (
+	bucket_id = 'User Image'
+	and (storage.foldername(name))[1] = auth.uid()::text
+);
+```

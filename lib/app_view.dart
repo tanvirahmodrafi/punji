@@ -31,15 +31,28 @@ class _MyAppViewState extends State<MyAppView> {
       debugShowCheckedModeBanner: false,
       title: "Punji",
       theme: ThemeData(
+        useMaterial3: true,
         colorScheme: ColorScheme.light(
           surface: Colors.grey.shade100,
           onSurface: Colors.black,
-          primary: Color(0xFF00B2E7),
-          secondary: Color(0xFFE064F7),
-          tertiary: Color(0xFFFF8D6C),
+          primary: const Color(0xFF00B2E7),
+          secondary: const Color(0xFFE064F7),
+          tertiary: const Color(0xFFFF8D6C),
           outline: Colors.grey.shade700,
         ),
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: const ColorScheme.dark(
+          surface: Color(0xFF0F1115),
+          onSurface: Color(0xFFECEFF4),
+          primary: Color(0xFF4FC3F7),
+          secondary: Color(0xFFE879F9),
+          tertiary: Color(0xFFFFA07A),
+          outline: Color(0xFF9CA3AF),
+        ),
+      ),
+      themeMode: ThemeMode.system,
       home: StreamBuilder<AuthState>(
         stream: Supabase.instance.client.auth.onAuthStateChange,
         builder: (context, _) {

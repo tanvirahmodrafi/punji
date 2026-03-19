@@ -7,6 +7,12 @@ import '../expense_repository.dart';
 class SupabaseExpenseRepo implements ExpenseRepository {
   final SupabaseClient _client = Supabase.instance.client;
 
+  ExpenseConnection _connectionFromRow(Map<String, dynamic> row) {
+    return ExpenseConnection.fromEntity(
+      ExpenseConnectionEntity.fromDocument(row),
+    );
+  }
+
   String _requireUserId() {
     final user = _client.auth.currentUser;
     if (user == null) {
@@ -184,6 +190,225 @@ class SupabaseExpenseRepo implements ExpenseRepository {
     } catch (e) {
       log(e.toString());
       rethrow;
+    }
+  }
+
+  // ── Expense connections (one-to-one partner system) ─────────────────────
+
+  @override
+  Future<ExpenseConnection?> getAcceptedConnection() async {
+    try {
+      final userId = _requireUserId();
+      final row = await _client
+          .from('expense_connections')
+          .select()
+          .eq('status', 'accepted')
+          .or('requester_id.eq.$userId,receiver_id.eq.$userId')
+          .limit(1)
+          .maybeSingle();
+      if (row == null) {
+        return null;
+      }
+      return _connectionFromRow(Map<String, dynamic>.from(row));
+    } catch (e) {
+      log('getAcceptedConnection failed: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<ExpenseConnection>> getIncomingPendingConnections() async {
+    try {
+      final userId = _requireUserId();
+      final data = await _client
+          .from('expense_connections')
+          .select()
+          .eq('receiver_id', userId)
+          .eq('status', 'pending')
+          .order('created_at', ascending: false);
+      return List<Map<String, dynamic>>.from(data)
+          .map(_connectionFromRow)
+          .toList();
+    } catch (e) {
+      log('getIncomingPendingConnections failed: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<ExpenseConnection?> getOutgoingPendingConnection() async {
+    try {
+      final userId = _requireUserId();
+      final row = await _client
+          .from('expense_connections')
+          .select()
+          .eq('requester_id', userId)
+          .eq('status', 'pending')
+          .order('created_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+      if (row == null) {
+        return null;
+      }
+      return _connectionFromRow(Map<String, dynamic>.from(row));
+    } catch (e) {
+      log('getOutgoingPendingConnection failed: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> sendExpenseConnectionInviteByEmail(String email) async {
+    try {
+      await _client.rpc(
+        'send_expense_connection_invite',
+        params: {'receiver_email': email.trim()},
+      );
+    } catch (e) {
+      log('sendExpenseConnectionInviteByEmail failed: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> respondToExpenseConnection({
+    required String connectionId,
+    required bool accept,
+  }) async {
+    try {
+      await _client.rpc(
+        'respond_expense_connection_invite',
+        params: {
+          'connection_id': connectionId,
+          'accept_invite': accept,
+        },
+      );
+    } catch (e) {
+      log('respondToExpenseConnection failed: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> cancelOutgoingExpenseConnection(String connectionId) async {
+    try {
+      await _client.rpc(
+        'cancel_expense_connection_invite',
+        params: {'connection_id': connectionId},
+      );
+    } catch (e) {
+      log('cancelOutgoingExpenseConnection failed: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> disconnectExpenseConnection(String connectionId) async {
+    try {
+      await _client.rpc(
+        'disconnect_expense_connection',
+        params: {'connection_id': connectionId},
+      );
+    } catch (e) {
+      log('disconnectExpenseConnection failed: $e');
+      rethrow;
+    }
+  }
+
+  // ── Split expense pair operations (secured by database RPC) ─────────────
+
+  @override
+  Future<void> createSplitExpensePair({
+    required Expense myExpense,
+    required String partnerUserId,
+    required int totalAmount,
+    required int partnerShareAmount,
+  }) async {
+    try {
+      await _client.rpc(
+        'create_split_expense_pair',
+        params: {
+          'p_expense_id': myExpense.expenseId,
+          'p_category_id': myExpense.category.categoryId,
+          'p_date': myExpense.date.toIso8601String(),
+          'p_total_amount': totalAmount,
+          'p_partner_share_amount': partnerShareAmount,
+          'p_partner_user_id': partnerUserId,
+        },
+      );
+    } catch (e) {
+      log('createSplitExpensePair failed: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateSplitExpensePair({
+    required Expense myExpense,
+    required int totalAmount,
+    required int partnerShareAmount,
+  }) async {
+    try {
+      final splitGroupId = myExpense.splitGroupId;
+      if (splitGroupId == null || splitGroupId.isEmpty) {
+        throw StateError('Missing split_group_id for split expense update.');
+      }
+
+      await _client.rpc(
+        'update_split_expense_pair',
+        params: {
+          'p_split_group_id': splitGroupId,
+          'p_category_id': myExpense.category.categoryId,
+          'p_date': myExpense.date.toIso8601String(),
+          'p_total_amount': totalAmount,
+          'p_partner_share_amount': partnerShareAmount,
+        },
+      );
+    } catch (e) {
+      log('updateSplitExpensePair failed: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> deleteSplitExpensePair(String splitGroupId) async {
+    try {
+      await _client.rpc(
+        'delete_split_expense_pair',
+        params: {'p_split_group_id': splitGroupId},
+      );
+    } catch (e) {
+      log('deleteSplitExpensePair failed: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, String?>> getUserProfileSummary(String userId) async {
+    try {
+      Map<String, dynamic>? row;
+      try {
+        row = await _client
+            .from('users')
+            .select('email, fullName, photoUrl')
+            .eq('userId', userId)
+            .maybeSingle();
+      } catch (_) {
+        row = await _client
+            .from('users')
+            .select('email, fullname, photourl')
+            .eq('userid', userId)
+            .maybeSingle();
+      }
+
+      return {
+        'email': (row?['email'])?.toString(),
+        'fullName': (row?['fullName'] ?? row?['fullname'])?.toString(),
+        'photoUrl': (row?['photoUrl'] ?? row?['photourl'])?.toString(),
+      };
+    } catch (e) {
+      log('getUserProfileSummary failed: $e');
+      return {'email': null, 'fullName': null, 'photoUrl': null};
     }
   }
 

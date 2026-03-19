@@ -9,6 +9,7 @@ import 'package:punji/screens/addEpense/blocs/get_categories/get_category_bloc.d
 import 'package:punji/screens/addEpense/views/addExpense.dart';
 import 'package:punji/screens/home/blocs/get_expenses/get_expenses_bloc.dart';
 import 'package:punji/screens/home/views/main_screen.dart';
+import 'package:punji/theme/app_ui_style.dart';
 
 import '../../stats/stats.dart';
 
@@ -21,17 +22,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int index = 0;
-  late Color selectedItem = Colors.blueAccent;
-  Color unSelectedItem = Colors.grey;
-
-  // @override
-  // void initState() {
-  //   selectedItem = Theme.of(context).colorScheme.primary;
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppUiStyle.isDark(context);
+    final selectedItem = Theme.of(context).colorScheme.primary;
+    final unselectedItem = Theme.of(
+      context,
+    ).colorScheme.outline.withValues(alpha: 0.75);
+
     return Scaffold(
       // Bottom Navigation Bar with `onTap` to switch between the screens
       bottomNavigationBar: ClipRRect(
@@ -43,22 +42,23 @@ class _HomeScreenState extends State<HomeScreen> {
               index = value;
             });
           },
-          backgroundColor: Colors.white,
+          backgroundColor:
+              AppUiStyle.card(context),
           showSelectedLabels: false,
           showUnselectedLabels: false,
-          elevation: 3,
+          elevation: isDark ? 0 : 3,
           items: [
             BottomNavigationBarItem(
               icon: Icon(
                 CupertinoIcons.home,
-                color: index == 0 ? selectedItem : unSelectedItem,
+                color: index == 0 ? selectedItem : unselectedItem,
               ),
               label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: Icon(
                 CupertinoIcons.chart_bar_alt_fill,
-                color: index == 1 ? selectedItem : unSelectedItem,
+                color: index == 1 ? selectedItem : unselectedItem,
               ),
               label: 'Stats',
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:punji/theme/app_ui_style.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignupPage extends StatefulWidget {
@@ -118,8 +119,13 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final titleColor = Theme.of(context).colorScheme.onSurface;
+    final bodyColor = Theme.of(
+      context,
+    ).colorScheme.outline.withValues(alpha: 0.9);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FA),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -136,27 +142,30 @@ class _SignupPageState extends State<SignupPage> {
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Create Your Account',
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF101828),
+                      color: titleColor,
                       letterSpacing: -0.4,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Track your money with a secure Punji account.',
                     style: TextStyle(
                       fontSize: 15,
-                      color: Color(0xFF475467),
+                      color: bodyColor,
                       height: 1.4,
                     ),
                   ),
@@ -174,7 +183,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: const Text(
                         'Have account? Sign in',
                         style: TextStyle(
-                          color: Color(0xFF2563EB),
+                          color: Colors.blue,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -186,7 +195,7 @@ class _SignupPageState extends State<SignupPage> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _signup,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF111827),
+                        backgroundColor: AppUiStyle.primaryButton(context),
                         foregroundColor: Colors.white,
                         minimumSize: const Size.fromHeight(54),
                         shape: RoundedRectangleBorder(
@@ -228,17 +237,18 @@ class _SignupPageState extends State<SignupPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppUiStyle.card(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFD0D5DD)),
+        border: Border.all(color: AppUiStyle.border(context)),
       ),
       child: TextField(
         controller: controller,
         obscureText: obscure,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(
-            color: Color(0xFF667085),
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.75),
             fontSize: 15,
             fontWeight: FontWeight.w500,
           ),

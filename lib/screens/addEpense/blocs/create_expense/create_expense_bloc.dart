@@ -15,7 +15,7 @@ class CreateExpenseBloc extends Bloc<CreateExpenseEvent, CreateExpenseState> {
         await expenseRepository.createExpense(event.expense);
         emit(CreateExpenseSuccess());
       } catch (e) {
-        emit(CreateExpenseFailure());
+        emit(CreateExpenseFailure(e.toString()));
       }
     });
 
@@ -25,7 +25,36 @@ class CreateExpenseBloc extends Bloc<CreateExpenseEvent, CreateExpenseState> {
         await expenseRepository.updateExpense(event.expense);
         emit(CreateExpenseSuccess());
       } catch (e) {
-        emit(CreateExpenseFailure());
+        emit(CreateExpenseFailure(e.toString()));
+      }
+    });
+
+    on<CreateSplitExpense>((event, emit) async {
+      emit(CreateExpenseLoading());
+      try {
+        await expenseRepository.createSplitExpensePair(
+          myExpense: event.expense,
+          partnerUserId: event.partnerUserId,
+          totalAmount: event.totalAmount,
+          partnerShareAmount: event.partnerShareAmount,
+        );
+        emit(CreateExpenseSuccess());
+      } catch (e) {
+        emit(CreateExpenseFailure(e.toString()));
+      }
+    });
+
+    on<UpdateSplitExpense>((event, emit) async {
+      emit(CreateExpenseLoading());
+      try {
+        await expenseRepository.updateSplitExpensePair(
+          myExpense: event.expense,
+          totalAmount: event.totalAmount,
+          partnerShareAmount: event.partnerShareAmount,
+        );
+        emit(CreateExpenseSuccess());
+      } catch (e) {
+        emit(CreateExpenseFailure(e.toString()));
       }
     });
   }

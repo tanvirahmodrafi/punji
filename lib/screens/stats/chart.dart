@@ -15,6 +15,13 @@ class MyChart extends StatefulWidget {
 class _MyChartState extends State<MyChart> {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final axisTextColor = Theme.of(
+      context,
+    ).colorScheme.outline.withValues(alpha: 0.9);
+    final barBackgroundColor =
+        isDark ? const Color(0xFF2A3240) : Colors.grey.shade300;
+
     // Aggregate expenses by category
     final Map<String, int> categoryTotals = {};
     for (var expense in widget.expenses) {
@@ -29,9 +36,10 @@ class _MyChartState extends State<MyChart> {
       return const Center(child: Text("No data to display"));
     }
 
-    final maxY = categoryAmounts.isNotEmpty
-        ? (categoryAmounts.reduce((a, b) => a > b ? a : b).toDouble() * 1.2)
-        : 5.0;
+    final maxY =
+        categoryAmounts.isNotEmpty
+            ? (categoryAmounts.reduce((a, b) => a > b ? a : b).toDouble() * 1.2)
+            : 5.0;
 
     return BarChart(
       BarChartData(
@@ -57,8 +65,8 @@ class _MyChartState extends State<MyChart> {
                       categoryNames[idx].length > 5
                           ? '${categoryNames[idx].substring(0, 5)}..'
                           : categoryNames[idx],
-                      style: const TextStyle(
-                        color: Colors.grey,
+                      style: TextStyle(
+                        color: axisTextColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -78,9 +86,9 @@ class _MyChartState extends State<MyChart> {
                   space: 0,
                   axisSide: meta.axisSide,
                   child: Text(
-                    '\$${value.toInt()}',
-                    style: const TextStyle(
-                      color: Colors.grey,
+                    '${value.toInt()}',
+                    style: TextStyle(
+                      color: axisTextColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
@@ -110,7 +118,7 @@ class _MyChartState extends State<MyChart> {
                 backDrawRodData: BackgroundBarChartRodData(
                   show: true,
                   toY: maxY,
-                  color: Colors.grey.shade300,
+                  color: barBackgroundColor,
                 ),
               ),
             ],

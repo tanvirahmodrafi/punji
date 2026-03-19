@@ -9,7 +9,13 @@ sealed class CreateExpenseState extends Equatable {
 
 final class CreateExpenseInitial extends CreateExpenseState {}
 
-final class CreateExpenseFailure extends CreateExpenseState {}
+final class CreateExpenseFailure extends CreateExpenseState {
+  final String message;
+  const CreateExpenseFailure([this.message = 'Failed to save expense']);
+
+  @override
+  List<Object> get props => [message];
+}
 
 final class CreateExpenseLoading extends CreateExpenseState {}
 

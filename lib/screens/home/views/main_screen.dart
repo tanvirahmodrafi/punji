@@ -14,6 +14,9 @@ import 'package:punji/screens/home/blocs/get_incomes/get_incomes_bloc.dart';
 import 'package:punji/screens/home/views/all_transactions_screen.dart';
 import 'package:punji/screens/addIncome/blocs/create_income/create_income_bloc.dart';
 import 'package:punji/screens/addIncome/views/addIncome.dart';
+import 'package:punji/screens/profile/views/edit_profile_page.dart';
+import 'package:punji/screens/split_expenses/views/split_expenses_screen.dart';
+import 'package:punji/theme/app_ui_style.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 const Map<String, Color> incomeCategoryColors = {
@@ -33,6 +36,46 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  String? _profileImageUrl;
+  String? _displayName;
+  bool _profileLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
+
+      final metadata = user.userMetadata;
+      final fullName =
+          metadata?['fullName'] ??
+          metadata?['full_name'] ??
+          user.email?.split('@').first ??
+          'User';
+
+      final imageUrl = await _loadProfileImageUrl(user.id);
+
+      if (mounted) {
+        setState(() {
+          _displayName = fullName;
+          _profileImageUrl = imageUrl;
+          _profileLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _profileLoading = false;
+        });
+      }
+    }
+  }
+
   Future<String?> _loadProfileImageUrl(String userId) async {
     final client = Supabase.instance.client;
     try {
@@ -79,93 +122,156 @@ class _MainScreenState extends State<MainScreen> {
         return Align(
           alignment: Alignment.centerRight,
           child: Material(
-            color: const Color(0xFFF5F6F8),
+            color: Colors.transparent,
             child: SafeArea(
               child: SizedBox(
                 width: MediaQuery.of(ctx).size.width * 0.83,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 18,
-                      ),
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 56,
-                            backgroundColor: Colors.grey.shade300,
-                            child:
-                                (profileImageUrl != null)
-                                    ? ClipOval(
-                                      child: Image.network(
-                                        profileImageUrl,
-                                        width: 112,
-                                        height: 112,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                Icon(
-                                                  CupertinoIcons.person_fill,
-                                                  size: 56,
-                                                  color: Colors.grey.shade700,
-                                                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppUiStyle.cardElevated(context),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      bottomLeft: Radius.circular(24),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF1F2937), Color(0xFF111827)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(24),
+                            bottomLeft: Radius.circular(24),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              radius: 46,
+                              backgroundColor: Colors.white24,
+                              child:
+                                  (profileImageUrl != null)
+                                      ? ClipOval(
+                                        child: Image.network(
+                                          profileImageUrl,
+                                          width: 92,
+                                          height: 92,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  const Icon(
+                                                    CupertinoIcons.person_fill,
+                                                    size: 42,
+                                                    color: Colors.white,
+                                                  ),
+                                        ),
+                                      )
+                                      : const Icon(
+                                        CupertinoIcons.person_fill,
+                                        size: 42,
+                                        color: Colors.white,
                                       ),
-                                    )
-                                    : Icon(
-                                      CupertinoIcons.person_fill,
-                                      size: 56,
-                                      color: Colors.grey.shade700,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              displayName.toString(),
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              email,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFFD1D5DB),
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.fromLTRB(14, 16, 14, 16),
+                          children: [
+                            _settingsItem(
+                              context: ctx,
+                              icon: CupertinoIcons.person_crop_circle,
+                              title: 'Edit Profile',
+                              onTap: () async {
+                                Navigator.of(ctx).pop();
+                                final updated = await Navigator.of(
+                                  context,
+                                ).push<bool>(
+                                  MaterialPageRoute<bool>(
+                                    builder: (_) => const EditProfilePage(),
+                                  ),
+                                );
+
+                                if (updated == true && mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Profile updated successfully.',
+                                      ),
                                     ),
-                          ),
-                          const SizedBox(height: 14),
-                          Text(
-                            displayName.toString(),
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF25272C),
+                                  );
+                                  _loadUserProfile();
+                                }
+                              },
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            email,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF6B7280),
+                            _settingsItem(
+                              context: ctx,
+                              icon: CupertinoIcons.arrow_left_right,
+                              title: 'Split Expenses',
+                              onTap: () async {
+                                Navigator.of(ctx).pop();
+                                await Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => const SplitExpensesScreen(),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                        ],
+                            _settingsItem(
+                              context: ctx,
+                              icon: CupertinoIcons.star,
+                              title: 'Rate Us',
+                              onTap: () {},
+                            ),
+                            _settingsItem(
+                              context: ctx,
+                              icon: CupertinoIcons.exclamationmark_bubble,
+                              title: 'Report a Problem',
+                              onTap: () {},
+                            ),
+                            const SizedBox(height: 12),
+                            _settingsItem(
+                              context: ctx,
+                              icon: CupertinoIcons.square_arrow_right,
+                              title: 'Log Out',
+                              isDanger: true,
+                              onTap: () async {
+                                Navigator.of(ctx).pop();
+                                await Supabase.instance.client.auth.signOut();
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: ListView(
-                        children: [
-                          ListTile(
-                            title: const Text('Edit Profile'),
-                            onTap: () {},
-                          ),
-                          ListTile(
-                            title: const Text('Currency Change'),
-                            onTap: () {},
-                          ),
-                          ListTile(title: const Text('Rate Us'), onTap: () {}),
-                          ListTile(
-                            title: const Text('Report a Problem'),
-                            onTap: () {},
-                          ),
-                          ListTile(
-                            title: const Text('Log Out'),
-                            textColor: Colors.redAccent,
-                            onTap: () async {
-                              Navigator.of(ctx).pop();
-                              await Supabase.instance.client.auth.signOut();
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -182,6 +288,61 @@ class _MainScreenState extends State<MainScreen> {
 
         return SlideTransition(position: slideAnimation, child: child);
       },
+    );
+  }
+
+  Widget _settingsItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isDanger = false,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final itemColor =
+        isDanger
+            ? Colors.redAccent
+            : (isDark ? const Color(0xFFE5E7EB) : const Color(0xFF1F2937));
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: AppUiStyle.card(context),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: isDark ? 0.24 : 0.06),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+        leading: Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: itemColor.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: Icon(icon, color: itemColor, size: 18),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: itemColor,
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+          ),
+        ),
+        trailing: Icon(
+          CupertinoIcons.chevron_right,
+          size: 16,
+          color: itemColor.withValues(alpha: 0.6),
+        ),
+        onTap: onTap,
+      ),
     );
   }
 
@@ -208,7 +369,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 ),
                 Text(
-                  '${expense.category.name} - \$${expense.amount}',
+                  '${expense.category.name} - ${expense.amount}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -248,7 +409,7 @@ class _MainScreenState extends State<MainScreen> {
             (ctx) => AlertDialog(
               title: const Text('Delete Expense'),
               content: Text(
-                'Are you sure you want to delete this ${expense.category.name} expense of \$${expense.amount}?',
+                'Are you sure you want to delete this ${expense.category.name} expense of ${expense.amount}?',
               ),
               actions: [
                 TextButton(
@@ -264,10 +425,34 @@ class _MainScreenState extends State<MainScreen> {
             ),
       );
       if (confirmed == true && mounted) {
-        context.read<GetExpensesBloc>().add(DeleteExpense(expense.expenseId));
+        final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+        if (expense.isSplit &&
+            expense.splitCreatedBy != null &&
+            expense.splitCreatedBy != currentUserId) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Only split creator can delete this split expense.',
+              ),
+            ),
+          );
+          return false;
+        }
+        context.read<GetExpensesBloc>().add(DeleteExpense(expense));
       }
     } else if (action == 'edit') {
       if (mounted) {
+        final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+        if (expense.isSplit &&
+            expense.splitCreatedBy != null &&
+            expense.splitCreatedBy != currentUserId) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Only split creator can edit this split expense.'),
+            ),
+          );
+          return false;
+        }
         final expenseRepository = context.read<ExpenseRepository>();
         await Navigator.push(
           context,
@@ -328,7 +513,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 ),
                 Text(
-                  '${income.category} - \$${income.amount}',
+                  '${income.category} - ${income.amount}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -368,7 +553,7 @@ class _MainScreenState extends State<MainScreen> {
             (ctx) => AlertDialog(
               title: const Text('Delete Income'),
               content: Text(
-                'Are you sure you want to delete this ${income.category} income of \$${income.amount}?',
+                'Are you sure you want to delete this ${income.category} income of ${income.amount}?',
               ),
               actions: [
                 TextButton(
@@ -440,6 +625,8 @@ class _MainScreenState extends State<MainScreen> {
                   (sum, i) => sum + i.amount,
                 );
                 final totalBalance = totalIncome - totalExpenses;
+                final isDark =
+                    Theme.of(context).brightness == Brightness.dark;
 
                 return Column(
                   children: [
@@ -458,10 +645,42 @@ class _MainScreenState extends State<MainScreen> {
                                     shape: BoxShape.circle,
                                     color: Colors.yellow[700],
                                   ),
-                                ),
-                                Icon(
-                                  CupertinoIcons.person_fill,
-                                  color: Colors.yellow[800],
+                                  child:
+                                      _profileLoading
+                                          ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                    Colors.white,
+                                                  ),
+                                            ),
+                                          )
+                                          : _profileImageUrl != null
+                                          ? ClipOval(
+                                            child: Image.network(
+                                              _profileImageUrl!,
+                                              width: 50,
+                                              height: 50,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (
+                                                context,
+                                                error,
+                                                stackTrace,
+                                              ) {
+                                                return Icon(
+                                                  CupertinoIcons.person_fill,
+                                                  color: Colors.yellow[800],
+                                                );
+                                              },
+                                            ),
+                                          )
+                                          : Icon(
+                                            CupertinoIcons.person_fill,
+                                            color: Colors.yellow[800],
+                                          ),
                                 ),
                               ],
                             ),
@@ -479,7 +698,7 @@ class _MainScreenState extends State<MainScreen> {
                                   ),
                                 ),
                                 Text(
-                                  "Tanvir Ahmod",
+                                  _displayName ?? 'User',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -526,19 +745,31 @@ class _MainScreenState extends State<MainScreen> {
                         height: min(MediaQuery.of(context).size.width / 2, 240),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              Theme.of(context).colorScheme.tertiary,
-                              Theme.of(context).colorScheme.secondary,
-                              Theme.of(context).colorScheme.primary,
-                            ],
+                            colors:
+                                isDark
+                                    ? const [
+                                      Color(0xFF2A1F3D),
+                                      Color(0xFF1F2940),
+                                      Color(0xFF13263D),
+                                    ]
+                                    : [
+                                      Theme.of(context).colorScheme.tertiary,
+                                      Theme.of(context).colorScheme.secondary,
+                                      Theme.of(context).colorScheme.primary,
+                                    ],
                             transform: const GradientRotation(pi / 4),
                           ),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              blurRadius: 4,
-                              color: Colors.grey.shade400,
-                              offset: const Offset(5, 5),
+                              blurRadius: isDark ? 18 : 4,
+                              color:
+                                  isDark
+                                      ? Colors.black.withValues(alpha: 0.45)
+                                      : Colors.grey.shade400,
+                              offset: isDark
+                                  ? const Offset(0, 10)
+                                  : const Offset(5, 5),
                             ),
                           ],
                         ),
@@ -555,7 +786,7 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              '\$ ${totalBalance.toStringAsFixed(2)}',
+                              '${totalBalance.toStringAsFixed(2)}',
                               style: const TextStyle(
                                 fontSize: 40,
                                 color: Colors.white,
@@ -602,7 +833,7 @@ class _MainScreenState extends State<MainScreen> {
                                             ),
                                           ),
                                           Text(
-                                            '\$ ${totalIncome.toStringAsFixed(2)}',
+                                            '${totalIncome.toStringAsFixed(2)}',
                                             style: const TextStyle(
                                               fontSize: 14,
                                               color: Colors.white,
@@ -644,7 +875,7 @@ class _MainScreenState extends State<MainScreen> {
                                             ),
                                           ),
                                           Text(
-                                            '\$ ${totalExpenses.toStringAsFixed(2)}',
+                                            '${totalExpenses.toStringAsFixed(2)}',
                                             style: const TextStyle(
                                               fontSize: 14,
                                               color: Colors.white,
@@ -701,6 +932,9 @@ class _MainScreenState extends State<MainScreen> {
                     const SizedBox(height: 20),
                     Expanded(
                       child: () {
+                        final currentUserId =
+                            Supabase.instance.client.auth.currentUser?.id;
+
                         // Merge expenses and incomes into a unified list
                         final List<dynamic> transactions = [
                           ...expenses,
@@ -728,7 +962,7 @@ class _MainScreenState extends State<MainScreen> {
                         }
 
                         return ListView.builder(
-                          itemCount: transactions.length,
+                          itemCount: min(transactions.length, 4),
                           itemBuilder: (context, int i) {
                             final item = transactions[i];
                             final bool isExpense = item is Expense;
@@ -741,6 +975,8 @@ class _MainScreenState extends State<MainScreen> {
                             final Widget circleChild;
                             final String amountPrefix;
                             final Color amountColor;
+                            bool isSplit = false;
+                            bool isPartnerTransaction = false;
 
                             if (isExpense) {
                               final expense = item;
@@ -765,6 +1001,12 @@ class _MainScreenState extends State<MainScreen> {
                               );
                               amountPrefix = '-';
                               amountColor = Colors.red;
+                              isSplit = expense.isSplit;
+                              isPartnerTransaction =
+                                  expense.isSplit &&
+                                  currentUserId != null &&
+                                  expense.splitCreatedBy != null &&
+                                  expense.splitCreatedBy != currentUserId;
                             } else {
                               final income = item as Income;
                               name = income.category;
@@ -794,7 +1036,13 @@ class _MainScreenState extends State<MainScreen> {
                                               DismissDirection.endToStart,
                                           background: Container(
                                             decoration: BoxDecoration(
-                                              color: Colors.grey.shade200,
+                                              color:
+                                                  Theme.of(context).brightness ==
+                                                          Brightness.dark
+                                                      ? AppUiStyle.cardMuted(
+                                                        context,
+                                                      )
+                                                      : Colors.grey.shade200,
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                             ),
@@ -830,6 +1078,9 @@ class _MainScreenState extends State<MainScreen> {
                                             circleChild,
                                             amountPrefix,
                                             amountColor,
+                                            isSplit: isSplit,
+                                            isPartnerTransaction:
+                                                isPartnerTransaction,
                                           ),
                                         ),
                                       )
@@ -843,7 +1094,13 @@ class _MainScreenState extends State<MainScreen> {
                                               DismissDirection.endToStart,
                                           background: Container(
                                             decoration: BoxDecoration(
-                                              color: Colors.grey.shade200,
+                                              color:
+                                                  Theme.of(context).brightness ==
+                                                          Brightness.dark
+                                                      ? AppUiStyle.cardMuted(
+                                                        context,
+                                                      )
+                                                      : Colors.grey.shade200,
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                             ),
@@ -879,6 +1136,7 @@ class _MainScreenState extends State<MainScreen> {
                                             circleChild,
                                             amountPrefix,
                                             amountColor,
+                                            isSplit: false,
                                           ),
                                         ),
                                       ),
@@ -905,12 +1163,15 @@ class _MainScreenState extends State<MainScreen> {
     Color circleColor,
     Widget circleChild,
     String amountPrefix,
-    Color amountColor,
-  ) {
+    Color amountColor, {
+    bool isSplit = false,
+    bool isPartnerTransaction = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppUiStyle.card(context),
         borderRadius: BorderRadius.circular(12),
+        boxShadow: AppUiStyle.cardShadow(context),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -934,13 +1195,59 @@ class _MainScreenState extends State<MainScreen> {
                   ],
                 ),
                 const SizedBox(width: 16),
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    if (isSplit)
+                      Container(
+                        margin: const EdgeInsets.only(left: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              isPartnerTransaction
+                                  ? Colors.deepPurple.withValues(alpha: 0.16)
+                                  : Colors.blue.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isPartnerTransaction
+                                  ? Icons.people_alt_rounded
+                                  : Icons.swap_horiz_rounded,
+                              size: 12,
+                              color:
+                                  isPartnerTransaction
+                                      ? Colors.deepPurple
+                                      : Colors.blue,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isPartnerTransaction ? 'Partner' : 'Split',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color:
+                                    isPartnerTransaction
+                                        ? Colors.deepPurple
+                                        : Colors.blue,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
@@ -948,7 +1255,7 @@ class _MainScreenState extends State<MainScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '$amountPrefix\$ $amount',
+                  '$amountPrefix $amount',
                   style: TextStyle(
                     fontSize: 14,
                     color: amountColor,

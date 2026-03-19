@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:punji/theme/app_ui_style.dart';
 
 class DownloadPdfScreen extends StatefulWidget {
   final List<Expense> expenses;
@@ -232,14 +233,14 @@ class _DownloadPdfScreenState extends State<DownloadPdfScreen> {
               pw.Text('From: ${dateFormat.format(fromDate)}'),
               pw.Text('To: ${dateFormat.format(toDate)}'),
               pw.SizedBox(height: 8),
-              pw.Text('Total Income: +\$${totalIncome.toString()}'),
-              pw.Text('Total Expense: -\$${totalExpense.toString()}'),
+              pw.Text('Total Income: +${totalIncome.toString()}'),
+              pw.Text('Total Expense: -${totalExpense.toString()}'),
               pw.Text(
-                'Net: \$${(totalIncome - totalExpense).toString()}',
+                'Net: ${(totalIncome - totalExpense).toString()}',
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
               pw.SizedBox(height: 16),
-              pw.Table.fromTextArray(
+              pw.TableHelper.fromTextArray(
                 headers: const ['Date', 'Type', 'Category', 'Amount'],
                 data:
                     transactions
@@ -248,7 +249,7 @@ class _DownloadPdfScreenState extends State<DownloadPdfScreen> {
                             dateFormat.format(tx.date),
                             tx.isIncome ? 'Income' : 'Expense',
                             tx.category,
-                            tx.isIncome ? '+\$${tx.amount}' : '-\$${tx.amount}',
+                            tx.isIncome ? '+${tx.amount}' : '-${tx.amount}',
                           ],
                         )
                         .toList(),
@@ -263,49 +264,156 @@ class _DownloadPdfScreenState extends State<DownloadPdfScreen> {
   @override
   Widget build(BuildContext context) {
     final displayFormat = DateFormat('dd MMM yyyy');
+    final isDark = AppUiStyle.isDark(context);
+    final cardColor = AppUiStyle.card(context);
+    final secondaryCardColor = AppUiStyle.cardMuted(context);
+    final hintColor = Theme.of(context).colorScheme.outline.withValues(alpha: 0.9);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Dawnload PDF')),
-      body: Padding(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: const Text('Download PDF'),
+      ),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Select date window',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors:
+                      isDark
+                          ? const [Color(0xFF1E293B), Color(0xFF111827)]
+                          : const [Color(0xFFEAF4FF), Color(0xFFF3ECFF)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Export Transactions',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Choose a date range and generate a shareable report',
+                    style: TextStyle(fontSize: 13, color: hintColor),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: _pickFromDate,
-              icon: const Icon(Icons.date_range),
-              label: Text(
-                _fromDate == null
-                    ? 'From date'
-                    : 'From: ${displayFormat.format(_fromDate!)}',
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  ...AppUiStyle.cardShadow(context),
+                ],
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 2),
+                  _dateSelectorTile(
+                    context: context,
+                    title: _fromDate == null
+                        ? 'From date'
+                        : 'From: ${displayFormat.format(_fromDate!)}',
+                    icon: Icons.date_range,
+                    onTap: _pickFromDate,
+                    bgColor: secondaryCardColor,
+                  ),
+                  const SizedBox(height: 12),
+                  _dateSelectorTile(
+                    context: context,
+                    title: _toDate == null
+                        ? 'To date'
+                        : 'To: ${displayFormat.format(_toDate!)}',
+                    icon: Icons.date_range_outlined,
+                    onTap: _pickToDate,
+                    bgColor: secondaryCardColor,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: _pickToDate,
-              icon: const Icon(Icons.date_range_outlined),
-              label: Text(
-                _toDate == null
-                    ? 'To date'
-                    : 'To: ${displayFormat.format(_toDate!)}',
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _isGenerating ? null : _downloadPdf,
-              child:
-                  _isGenerating
-                      ? const SizedBox(
-                        height: 22,
-                        width: 22,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+            const SizedBox(height: 18),
+            SizedBox(
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: _isGenerating ? null : _downloadPdf,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppUiStyle.primaryButton(context),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: _isGenerating
+                    ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
-                      : const Text('Download'),
+                    : const Icon(Icons.picture_as_pdf_outlined),
+                label: Text(_isGenerating ? 'Generating...' : 'Generate PDF'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _dateSelectorTile({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+    required Color bgColor,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: Theme.of(context).colorScheme.outline),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Theme.of(context).colorScheme.outline,
             ),
           ],
         ),

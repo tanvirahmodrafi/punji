@@ -10,9 +10,9 @@ sealed class GetExpensesEvent extends Equatable {
 class GetExpenses extends GetExpensesEvent {}
 
 class DeleteExpense extends GetExpensesEvent {
-  final String expenseId;
-  const DeleteExpense(this.expenseId);
+  final Expense expense;
+  const DeleteExpense(this.expense);
 
   @override
-  List<Object> get props => [expenseId];
+  List<Object> get props => [expense];
 }

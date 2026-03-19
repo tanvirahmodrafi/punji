@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:punji/screens/auth/views/signup_page.dart';
+import 'package:punji/theme/app_ui_style.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -98,8 +99,13 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final titleColor = Theme.of(context).colorScheme.onSurface;
+    final bodyColor = Theme.of(
+      context,
+    ).colorScheme.outline.withValues(alpha: 0.9);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FA),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -110,21 +116,21 @@ class _LoginPageState extends State<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 48),
-                  const Text(
+                  Text(
                     'Welcome Back',
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF101828),
+                      color: titleColor,
                       letterSpacing: -0.4,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Sign in to continue managing your finances.',
                     style: TextStyle(
                       fontSize: 15,
-                      color: Color(0xFF475467),
+                      color: bodyColor,
                       height: 1.4,
                     ),
                   ),
@@ -154,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Text(
                         'Create account',
                         style: TextStyle(
-                          color: Color(0xFF2563EB),
+                          color: Colors.blue,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -166,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _login,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF111827),
+                        backgroundColor: AppUiStyle.primaryButton(context),
                         foregroundColor: Colors.white,
                         minimumSize: const Size.fromHeight(54),
                         shape: RoundedRectangleBorder(
@@ -217,17 +223,18 @@ class _FieldCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppUiStyle.card(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFD0D5DD)),
+        border: Border.all(color: AppUiStyle.border(context)),
       ),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: const TextStyle(
-            color: Color(0xFF667085),
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.75),
             fontSize: 15,
             fontWeight: FontWeight.w500,
           ),
