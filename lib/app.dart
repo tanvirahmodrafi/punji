@@ -16,15 +16,11 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create:
-                (context) =>
-                    GetExpensesBloc(context.read<ExpenseRepository>())
-                      ..add(GetExpenses()),
+                (context) => GetExpensesBloc(context.read<ExpenseRepository>()),
           ),
           BlocProvider(
             create:
-                (context) =>
-                    GetIncomesBloc(context.read<ExpenseRepository>())
-                      ..add(GetIncomes()),
+                (context) => GetIncomesBloc(context.read<ExpenseRepository>()),
           ),
         ],
         child: const MyAppView(),

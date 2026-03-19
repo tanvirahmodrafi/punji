@@ -21,11 +21,20 @@ class IncomeEntity {
   }
 
   static IncomeEntity fromDocument(Map<String, dynamic> doc) {
+    final incomeId = doc['incomeId'] ?? doc['incomeid'] ?? '';
+    final category = doc['category'] ?? '';
+    final dateRaw = doc['date'];
+    final amountRaw = doc['amount'] ?? 0;
+
     return IncomeEntity(
-      incomeId: doc['incomeId'],
-      category: doc['category'],
-      date: DateTime.parse(doc['date']),
-      amount: doc['amount'],
+      incomeId: incomeId.toString(),
+      category: category.toString(),
+      date: dateRaw is DateTime
+          ? dateRaw
+          : DateTime.tryParse(dateRaw?.toString() ?? '') ?? DateTime.now(),
+      amount: amountRaw is int
+          ? amountRaw
+          : int.tryParse(amountRaw.toString()) ?? 0,
     );
   }
 }

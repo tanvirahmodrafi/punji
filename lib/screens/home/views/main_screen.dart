@@ -14,6 +14,7 @@ import 'package:punji/screens/home/blocs/get_incomes/get_incomes_bloc.dart';
 import 'package:punji/screens/home/views/all_transactions_screen.dart';
 import 'package:punji/screens/addIncome/blocs/create_income/create_income_bloc.dart';
 import 'package:punji/screens/addIncome/views/addIncome.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 const Map<String, Color> incomeCategoryColors = {
   'Salary': Colors.amber,
@@ -32,6 +33,158 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  Future<String?> _loadProfileImageUrl(String userId) async {
+    final client = Supabase.instance.client;
+    try {
+      final row =
+          await client
+              .from('users')
+              .select('photourl')
+              .eq('userid', userId)
+              .maybeSingle();
+      final raw = row?['photourl'];
+      if (raw is String && raw.trim().isNotEmpty) {
+        final candidate = raw.trim();
+        final parsed = Uri.tryParse(candidate);
+        if (parsed != null && parsed.hasScheme && parsed.host.isNotEmpty) {
+          return candidate;
+        }
+      }
+    } catch (_) {
+      // Keep avatar fallback if profile URL lookup fails.
+    }
+    return null;
+  }
+
+  Future<void> _openSettingsPanel() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    final metadata = user?.userMetadata;
+    final displayName =
+        metadata?['fullName'] ??
+        metadata?['full_name'] ??
+        user?.email?.split('@').first ??
+        'User';
+    final email = user?.email ?? 'No email';
+    final userId = user?.id;
+    final profileImageUrl =
+        userId == null ? null : await _loadProfileImageUrl(userId);
+
+    showGeneralDialog<void>(
+      context: context,
+      barrierLabel: 'Settings',
+      barrierDismissible: true,
+      barrierColor: Colors.black45,
+      transitionDuration: const Duration(milliseconds: 260),
+      pageBuilder: (ctx, animation, secondaryAnimation) {
+        return Align(
+          alignment: Alignment.centerRight,
+          child: Material(
+            color: const Color(0xFFF5F6F8),
+            child: SafeArea(
+              child: SizedBox(
+                width: MediaQuery.of(ctx).size.width * 0.83,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 18,
+                      ),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 56,
+                            backgroundColor: Colors.grey.shade300,
+                            child:
+                                (profileImageUrl != null)
+                                    ? ClipOval(
+                                      child: Image.network(
+                                        profileImageUrl,
+                                        width: 112,
+                                        height: 112,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                Icon(
+                                                  CupertinoIcons.person_fill,
+                                                  size: 56,
+                                                  color: Colors.grey.shade700,
+                                                ),
+                                      ),
+                                    )
+                                    : Icon(
+                                      CupertinoIcons.person_fill,
+                                      size: 56,
+                                      color: Colors.grey.shade700,
+                                    ),
+                          ),
+                          const SizedBox(height: 14),
+                          Text(
+                            displayName.toString(),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF25272C),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            email,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          ListTile(
+                            title: const Text('Edit Profile'),
+                            onTap: () {},
+                          ),
+                          ListTile(
+                            title: const Text('Currency Change'),
+                            onTap: () {},
+                          ),
+                          ListTile(title: const Text('Rate Us'), onTap: () {}),
+                          ListTile(
+                            title: const Text('Report a Problem'),
+                            onTap: () {},
+                          ),
+                          ListTile(
+                            title: const Text('Log Out'),
+                            textColor: Colors.redAccent,
+                            onTap: () async {
+                              Navigator.of(ctx).pop();
+                              await Supabase.instance.client.auth.signOut();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (ctx, animation, secondaryAnimation, child) {
+        final slideAnimation = Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+        );
+
+        return SlideTransition(position: slideAnimation, child: child);
+      },
+    );
+  }
+
   Future<bool> _showSwipeActions(BuildContext context, Expense expense) async {
     final action = await showModalBottomSheet<String>(
       context: context,
@@ -343,7 +496,7 @@ class _MainScreenState extends State<MainScreen> {
                             CupertinoIcons.settings,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
-                          onPressed: () {},
+                          onPressed: _openSettingsPanel,
                         ),
                       ],
                     ),

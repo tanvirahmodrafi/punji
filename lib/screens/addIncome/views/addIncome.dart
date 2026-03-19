@@ -94,7 +94,7 @@ class _AddIncomeState extends State<AddIncome> {
           Navigator.pop(context);
         } else if (state is CreateIncomeFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to save income')),
+            SnackBar(content: Text('Failed to save income: ${state.message}')),
           );
         }
       },

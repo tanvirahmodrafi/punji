@@ -24,12 +24,20 @@ class CategoryEntity {
   }
 
   static CategoryEntity fromDocument(Map<String, dynamic> doc) {
+    final categoryId = doc['categoryId'] ?? doc['categoryid'] ?? '';
+    final name = doc['name'] ?? '';
+    final totalExpenses = doc['totalExpenses'] ?? doc['totalexpenses'] ?? 0;
+    final icon = doc['icon'] ?? '';
+    final color = doc['color'] ?? '';
+
     return CategoryEntity(
-      categoryId: doc['categoryId'],
-      name: doc['name'],
-      totalExpenses: doc['totalExpenses'],
-      icon: doc['icon'],
-      color: doc['color'],
+      categoryId: categoryId.toString(),
+      name: name.toString(),
+      totalExpenses: totalExpenses is int
+          ? totalExpenses
+          : int.tryParse(totalExpenses.toString()) ?? 0,
+      icon: icon.toString(),
+      color: color.toString(),
     );
   }
 }

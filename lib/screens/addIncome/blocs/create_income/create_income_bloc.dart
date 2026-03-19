@@ -15,7 +15,7 @@ class CreateIncomeBloc extends Bloc<CreateIncomeEvent, CreateIncomeState> {
         await expenseRepository.createIncome(event.income);
         emit(CreateIncomeSuccess());
       } catch (e) {
-        emit(CreateIncomeFailure());
+        emit(CreateIncomeFailure(e.toString()));
       }
     });
   }

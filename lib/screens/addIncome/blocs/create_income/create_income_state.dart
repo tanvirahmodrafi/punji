@@ -9,7 +9,14 @@ sealed class CreateIncomeState extends Equatable {
 
 final class CreateIncomeInitial extends CreateIncomeState {}
 
-final class CreateIncomeFailure extends CreateIncomeState {}
+final class CreateIncomeFailure extends CreateIncomeState {
+  final String message;
+
+  const CreateIncomeFailure(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
 
 final class CreateIncomeLoading extends CreateIncomeState {}
 
