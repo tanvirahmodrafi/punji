@@ -234,7 +234,9 @@ class _FieldCard extends StatelessWidget {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.75),
+            color: Theme.of(
+              context,
+            ).colorScheme.outline.withValues(alpha: 0.75),
             fontSize: 15,
             fontWeight: FontWeight.w500,
           ),

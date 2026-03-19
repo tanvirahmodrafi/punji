@@ -31,14 +31,11 @@ class _SplitExpensesView extends StatefulWidget {
 class _SplitExpensesViewState extends State<_SplitExpensesView> {
   final TextEditingController _emailController = TextEditingController();
 
-  bool _isDark(BuildContext context) =>
-      AppUiStyle.isDark(context);
+  bool _isDark(BuildContext context) => AppUiStyle.isDark(context);
 
-  Color _cardColor(BuildContext context) =>
-      AppUiStyle.card(context);
+  Color _cardColor(BuildContext context) => AppUiStyle.card(context);
 
-  Color _mutedCardColor(BuildContext context) =>
-      AppUiStyle.cardMuted(context);
+  Color _mutedCardColor(BuildContext context) => AppUiStyle.cardMuted(context);
 
   @override
   void dispose() {
@@ -181,7 +178,10 @@ class _SplitExpensesViewState extends State<_SplitExpensesView> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.blue.withValues(alpha: 0.3), width: 1.5),
+        border: Border.all(
+          color: Colors.blue.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
       ),
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -355,13 +355,17 @@ class _SplitExpensesViewState extends State<_SplitExpensesView> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.3),
                   width: 1.5,
                 ),
               ),
@@ -439,7 +443,10 @@ class _SplitExpensesViewState extends State<_SplitExpensesView> {
       decoration: BoxDecoration(
         color: Colors.amber.withValues(alpha: isDark ? 0.14 : 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.amber.withValues(alpha: 0.3), width: 1.5),
+        border: Border.all(
+          color: Colors.amber.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -554,7 +561,10 @@ class _SplitExpensesViewState extends State<_SplitExpensesView> {
       decoration: BoxDecoration(
         color: Colors.blue.withValues(alpha: isDark ? 0.14 : 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.blue.withValues(alpha: 0.2), width: 1.5),
+        border: Border.all(
+          color: Colors.blue.withValues(alpha: 0.2),
+          width: 1.5,
+        ),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -693,10 +703,7 @@ class _SplitExpensesViewState extends State<_SplitExpensesView> {
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color:
-              isDark
-                  ? const Color(0xFF2B3442)
-                  : Colors.grey.shade200,
+          color: isDark ? const Color(0xFF2B3442) : Colors.grey.shade200,
           width: 1.5,
         ),
       ),

@@ -267,7 +267,9 @@ class _DownloadPdfScreenState extends State<DownloadPdfScreen> {
     final isDark = AppUiStyle.isDark(context);
     final cardColor = AppUiStyle.card(context);
     final secondaryCardColor = AppUiStyle.cardMuted(context);
-    final hintColor = Theme.of(context).colorScheme.outline.withValues(alpha: 0.9);
+    final hintColor = Theme.of(
+      context,
+    ).colorScheme.outline.withValues(alpha: 0.9);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -318,18 +320,17 @@ class _DownloadPdfScreenState extends State<DownloadPdfScreen> {
               decoration: BoxDecoration(
                 color: cardColor,
                 borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  ...AppUiStyle.cardShadow(context),
-                ],
+                boxShadow: [...AppUiStyle.cardShadow(context)],
               ),
               child: Column(
                 children: [
                   const SizedBox(height: 2),
                   _dateSelectorTile(
                     context: context,
-                    title: _fromDate == null
-                        ? 'From date'
-                        : 'From: ${displayFormat.format(_fromDate!)}',
+                    title:
+                        _fromDate == null
+                            ? 'From date'
+                            : 'From: ${displayFormat.format(_fromDate!)}',
                     icon: Icons.date_range,
                     onTap: _pickFromDate,
                     bgColor: secondaryCardColor,
@@ -337,9 +338,10 @@ class _DownloadPdfScreenState extends State<DownloadPdfScreen> {
                   const SizedBox(height: 12),
                   _dateSelectorTile(
                     context: context,
-                    title: _toDate == null
-                        ? 'To date'
-                        : 'To: ${displayFormat.format(_toDate!)}',
+                    title:
+                        _toDate == null
+                            ? 'To date'
+                            : 'To: ${displayFormat.format(_toDate!)}',
                     icon: Icons.date_range_outlined,
                     onTap: _pickToDate,
                     bgColor: secondaryCardColor,
@@ -359,16 +361,17 @@ class _DownloadPdfScreenState extends State<DownloadPdfScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                icon: _isGenerating
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Icon(Icons.picture_as_pdf_outlined),
+                icon:
+                    _isGenerating
+                        ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                        : const Icon(Icons.picture_as_pdf_outlined),
                 label: Text(_isGenerating ? 'Generating...' : 'Generate PDF'),
               ),
             ),

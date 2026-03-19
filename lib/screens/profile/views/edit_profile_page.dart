@@ -253,7 +253,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     CircleAvatar(
                       radius: 54,
                       backgroundColor:
-                          isDark ? AppUiStyle.cardMuted(context) : Colors.grey.shade300,
+                          isDark
+                              ? AppUiStyle.cardMuted(context)
+                              : Colors.grey.shade300,
                       child: ClipOval(
                         child:
                             _pickedImage != null
@@ -306,8 +308,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           width: 34,
                           height: 34,
                           decoration: BoxDecoration(
-                            color:
-                              AppUiStyle.primaryButton(context),
+                            color: AppUiStyle.primaryButton(context),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color:
@@ -420,10 +421,9 @@ class _InputCard extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(
-                color:
-                    Theme.of(
-                      context,
-                    ).colorScheme.outline.withValues(alpha: 0.75),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.75),
               ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(

@@ -248,7 +248,9 @@ class _SignupPageState extends State<SignupPage> {
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.75),
+            color: Theme.of(
+              context,
+            ).colorScheme.outline.withValues(alpha: 0.75),
             fontSize: 15,
             fontWeight: FontWeight.w500,
           ),

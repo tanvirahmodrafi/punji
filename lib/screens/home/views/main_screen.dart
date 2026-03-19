@@ -625,8 +625,7 @@ class _MainScreenState extends State<MainScreen> {
                   (sum, i) => sum + i.amount,
                 );
                 final totalBalance = totalIncome - totalExpenses;
-                final isDark =
-                    Theme.of(context).brightness == Brightness.dark;
+                final isDark = Theme.of(context).brightness == Brightness.dark;
 
                 return Column(
                   children: [
@@ -767,9 +766,10 @@ class _MainScreenState extends State<MainScreen> {
                                   isDark
                                       ? Colors.black.withValues(alpha: 0.45)
                                       : Colors.grey.shade400,
-                              offset: isDark
-                                  ? const Offset(0, 10)
-                                  : const Offset(5, 5),
+                              offset:
+                                  isDark
+                                      ? const Offset(0, 10)
+                                      : const Offset(5, 5),
                             ),
                           ],
                         ),
@@ -1037,7 +1037,9 @@ class _MainScreenState extends State<MainScreen> {
                                           background: Container(
                                             decoration: BoxDecoration(
                                               color:
-                                                  Theme.of(context).brightness ==
+                                                  Theme.of(
+                                                            context,
+                                                          ).brightness ==
                                                           Brightness.dark
                                                       ? AppUiStyle.cardMuted(
                                                         context,
@@ -1095,7 +1097,9 @@ class _MainScreenState extends State<MainScreen> {
                                           background: Container(
                                             decoration: BoxDecoration(
                                               color:
-                                                  Theme.of(context).brightness ==
+                                                  Theme.of(
+                                                            context,
+                                                          ).brightness ==
                                                           Brightness.dark
                                                       ? AppUiStyle.cardMuted(
                                                         context,

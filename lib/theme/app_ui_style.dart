@@ -4,7 +4,8 @@ class AppUiStyle {
   static bool isDark(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark;
 
-  static Color page(BuildContext context) => Theme.of(context).colorScheme.surface;
+  static Color page(BuildContext context) =>
+      Theme.of(context).colorScheme.surface;
 
   static Color card(BuildContext context) =>
       isDark(context) ? const Color(0xFF1A1F28) : Colors.white;

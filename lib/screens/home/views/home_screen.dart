@@ -42,8 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
               index = value;
             });
           },
-          backgroundColor:
-              AppUiStyle.card(context),
+          backgroundColor: AppUiStyle.card(context),
           showSelectedLabels: false,
           showUnselectedLabels: false,
           elevation: isDark ? 0 : 3,
